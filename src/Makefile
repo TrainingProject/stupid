@@ -1,7 +1,7 @@
 all: stupid
 
 objs = main.o utils.o skbuff.o dev.o ip_input.o udp.o tcp.o ip_output.o arp.o \
-ip_route.o netdevice.o sock.o
+ip_route.o netdevice.o sock.o dhcp.o
 
 $(objs):%.o:%.c
 	gcc -Wall -c -o $@ $<

@@ -16,6 +16,7 @@
 #include "skbuff.h"
 #include "arp.h"
 #include "utils.h"
+#include "dhcp.h"
 
 struct sk_buff_head dev_backlog;
 pthread_cond_t dev_cond = PTHREAD_COND_INITIALIZER;
@@ -93,6 +94,7 @@ void dev_send(struct sk_buff *skb)
 {
 	struct ethhdr *eh;
 	unsigned char mac[ETH_ALEN];
+	memset(mac, -1, sizeof(mac));
 	int hl;
 
 	struct arptab *arpentry;
@@ -111,11 +113,14 @@ void dev_send(struct sk_buff *skb)
 	switch (skb->protocol)
 	{
 	case ETHERTYPE_IP:
-		arpentry = arp_lookup(skb, skb->sock->dest.nexthop, mac);
-		if (arpentry == NULL)
+		if(DHCP_Done)
 		{
-			printf("put to arp wait list\n");
-			return;
+			arpentry = arp_lookup(skb, skb->sock->dest.nexthop, mac);
+			if (arpentry == NULL)
+			{
+				printf("put to arp wait list\n");
+				return;
+			}
 		}
 		memcpy(eh->h_dest, mac, ETH_ALEN);
 		memcpy(eh->h_source, skb->nic->dev_addr, ETH_ALEN);
