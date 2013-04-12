@@ -10,6 +10,7 @@
 #include "udp.h"
 #include "utils.h"
 #include "ip.h"
+#include "dhcp.h"
 
 #define  port_range_lower_bound 32768
 #define  port_range_up_bound 61000
@@ -66,6 +67,13 @@ void udp_rcv(struct sk_buff *skb)
 	       ntohs(uh->source), ntohs(uh->dest), skb->len);
 
 	data_dump("    udp data", skb->data, skb->len);
+
+	if(ntohs(uh->source) == DHCP_SERVER_PORT && ntohs(uh->dest) == DHCP_CLIENT_PORT)
+	{
+		do_dhcp(skb->data, skb->len);
+		skb_free(skb);
+		return;
+	}
 
 	sock_try_insert(skb);
 }

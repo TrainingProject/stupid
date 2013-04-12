@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <linux/ip.h>
+#include <linux/udp.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <string.h>
 
 #include "ip.h"
@@ -25,7 +27,7 @@ void ip_rcv(struct sk_buff *skb)
 		skb->csum = in_checksum((__u16 *) iph, iph->ihl * 4);
 	if (skb->csum != 0)
 		goto drop;
-	if (iph->daddr != skb->nic->ip) /* broadcast? */
+	if (iph->daddr != skb->nic->ip && iph->daddr != inet_addr("255.255.255.255")) /* broadcast? */
 		goto drop;
 	
 	char s[20], d[20];

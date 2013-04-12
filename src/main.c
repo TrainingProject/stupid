@@ -22,7 +22,9 @@
 #include "udp.h"
 #include "arp.h"
 #include "ip_route.h"
+#include "dhcp.h"
 
+int IP_Method = -1;  //1 for dynamic ip, 0 for static ip
 pthread_t recv_thread;
 pthread_t protocol_stack_thread;
 pthread_t arp_queue_thread;
@@ -96,6 +98,14 @@ void net_device_config(struct net_device *nic)
 			nic->netmask = inet_addr(value);
 		else if (strcmp(key, "gateway") == 0)
 			nic->gateway = inet_addr(value);
+		else if (strcmp(key, "IP_Method") == 0)
+		{
+			sscanf(value, "%d", &IP_Method);
+			if (IP_Method == 1)
+                                printf("Dynamic IP\n");
+			else if(IP_Method == 0)
+				printf("Static IP\n");
+		}
 		else
 			error_msg_and_die("invalid config file");
 	}
@@ -176,6 +186,11 @@ int main()
 	arp_queue_thread_init();
 	sock_thread_init();
 	receive_thread_init();	/* init this at last is better */
+
+	//the following code is used for DHCP
+	if(IP_Method == 1)
+		dhcp_init();
+	dhcp_wait();  //wait for DHCP, if failed, use static ip
 
 	/* daemon(1, 1); */
 
