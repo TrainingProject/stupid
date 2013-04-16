@@ -3,12 +3,14 @@
 #include <linux/udp.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <string.h>
 
 #include "ip.h"
 #include "udp.h"
 #include "tcp.h"
 #include "utils.h"
+#include "icmp.h"
 
 void ip_rcv(struct sk_buff *skb)
 {
@@ -47,6 +49,7 @@ void ip_rcv(struct sk_buff *skb)
 		break;
 	case IPPROTO_ICMP:
 		printf("ICMP packet received\n");
+		icmp_rcv_send(skb,iph->daddr,iph->saddr);
 		goto drop;
 		break;
 	case IPPROTO_IGMP:

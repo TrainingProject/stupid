@@ -27,12 +27,12 @@ void arp_init()
 	skb_queue_head_init(&arp_queue);
 }
 
-static int arp_hash(__u32 x)
+int arp_hash(__u32 x)
 {
 	return (x >> 24) & (ARP_TABLE_SIZE - 1);
 }
 
-static void arp_request(__be32 daddr)
+void arp_request(__be32 daddr)
 {
 	struct sk_buff *skb;
 	struct ethhdr *eh;
@@ -162,7 +162,7 @@ void arp_rcv(struct sk_buff *skb)
 		memcpy(ap->__ar_tha, eh->h_source, ETH_ALEN);
 		memcpy(eh->h_dest, eh->h_source, ETH_ALEN);
 		memcpy(eh->h_source, skb->nic->dev_addr, ETH_ALEN);
-
+                skb->len +=14;
 		skb->ip_summed = 0;
 		skb->protocol = ETHERTYPE_ARP;
 		dev_send(skb);

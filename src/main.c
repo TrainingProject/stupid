@@ -23,12 +23,15 @@
 #include "arp.h"
 #include "ip_route.h"
 #include "dhcp.h"
+#include "icmp.h"
 
 int IP_Method = -1;  //1 for dynamic ip, 0 for static ip
+
 pthread_t recv_thread;
 pthread_t protocol_stack_thread;
 pthread_t arp_queue_thread;
 pthread_t sock_thread;
+pthread_t myping;
 extern struct sk_buff_head dev_backlog;
 
 /* we use this pid file for three purposes: pid, unique server, user application
@@ -158,6 +161,11 @@ void sock_thread_init()
 	pthread_create(&sock_thread, NULL, do_sock, NULL);
 }
 
+void myping_init()
+{
+		pthread_create(&myping, NULL, do_ping, NULL);
+}
+
 static void sig_int(int sig)
 {
 	printf("bye\n");
@@ -186,7 +194,7 @@ int main()
 	arp_queue_thread_init();
 	sock_thread_init();
 	receive_thread_init();	/* init this at last is better */
-
+	myping_init();
 	//the following code is used for DHCP
 	if(IP_Method == 1)
 		dhcp_init();

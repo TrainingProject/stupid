@@ -15,5 +15,6 @@ extern void dev_send(struct sk_buff *skb);
 
 extern void *do_dev_receive_thread(void *arg);
 extern void *do_protocol_receive_thread(void *arg);
+extern int dev_xmit(struct sk_buff *skb);
 
 #endif
