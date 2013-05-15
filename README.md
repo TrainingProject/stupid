@@ -1,3 +1,6 @@
+The project is temporarily suspended because some team members are busy for these days.
+For the newest commit of TCP part, please refer to https://github.com/prehistoricpenguin/stupid
+
 Introduction
 ============
 
